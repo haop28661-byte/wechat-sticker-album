@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1 - 2026-11-06
+
+- Added `api_key_file` and `api_key_json_path` so a profile can reuse a local JSON credential file without copying the secret.
+- Environment variables continue to take precedence over file-based credentials.
+- Added regression coverage for nested credential paths.
+
 ## 2.0.0 - 2026-11-06
 
 - Removed the fixed DaiTu provider, base URL, and model names.

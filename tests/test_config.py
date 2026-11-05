@@ -83,3 +83,32 @@ def test_missing_config_has_actionable_error(tmp_path, monkeypatch):
         assert "cli.py init" in str(exc)
     else:
         raise AssertionError("Expected ConfigError")
+
+
+def test_api_key_can_be_loaded_from_json_file(tmp_path, monkeypatch):
+    monkeypatch.delenv("WECHAT_STICKER_IMAGE_API_KEY", raising=False)
+    credentials = tmp_path / "credentials.json"
+    credentials.write_text(
+        json.dumps({"nested": {"key": "file-secret"}}),
+        encoding="utf-8",
+    )
+    config = tmp_path / "config.json"
+    config.write_text(
+        json.dumps(
+            {
+                "default_profile": "main",
+                "profiles": {
+                    "main": {
+                        "base_url": "https://example.test/v1",
+                        "model": "test-model",
+                        "api_key_file": str(credentials),
+                        "api_key_json_path": "nested.key",
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    _, profile = load_settings(config)
+    assert profile.api_key == "file-secret"
+    assert profile.api_key_file == str(credentials)

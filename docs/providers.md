@@ -63,6 +63,19 @@ python scripts/cli.py generate --profile quality ...
 
 Fallback profiles are retried in order after provider failure.
 
+## Shared credential file
+
+To reuse a local JSON credential file without copying its secret:
+
+```json
+{
+  "api_key_file": "/absolute/path/to/credentials.json",
+  "api_key_json_path": "api_key"
+}
+```
+
+`api_key_json_path` supports dot-separated object keys and list indexes. Environment variables take precedence over the file.
+
 ## Reference image support
 
 Set `capabilities.supports_reference_images` explicitly.

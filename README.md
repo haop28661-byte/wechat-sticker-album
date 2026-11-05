@@ -78,6 +78,7 @@ Edit `.wechat-sticker-album/config.json` and set:
 - `base_url`
 - `model`
 - `api_key_env` or an environment-only setup
+- optional `api_key_file` and `api_key_json_path` for a local shared credential file
 - capability flags
 
 Recommended secret environment variable:

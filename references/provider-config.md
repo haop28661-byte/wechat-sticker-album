@@ -49,6 +49,8 @@ WECHAT_STICKER_PROFILE=default
       "base_url": "https://provider.example/v1",
       "model": "provider-image-model",
       "api_key_env": "WECHAT_STICKER_IMAGE_API_KEY",
+      "api_key_file": "",
+      "api_key_json_path": "api_key",
       "generation_endpoint": "/images/generations",
       "edit_endpoint": "/images/edits",
       "api_key_header": "Authorization",
@@ -93,6 +95,24 @@ Profiles are arbitrary. The skill never assumes a fixed model name or version.
 - `false`: generate a flat `#00FFFF` chroma-key base and let `finalize_album.py` extract transparency
 
 Set these explicitly. Do not infer capabilities from a model name.
+
+## Shared credential file
+
+For local setups where another tool already owns a JSON credential file, read the key without copying it:
+
+```json
+{
+  "api_key_file": "/absolute/path/to/credentials.json",
+  "api_key_json_path": "api_key"
+}
+```
+
+The file path should be absolute. `api_key_json_path` supports dot-separated object keys and list indexes. Credential precedence is:
+
+1. the environment variable named by `api_key_env`
+2. `WECHAT_STICKER_IMAGE_API_KEY`
+3. `api_key_file`
+4. a literal `api_key` field
 
 ## Fallback profiles
 

@@ -31,6 +31,8 @@ class ProviderProfile:
     model: str
     api_key: str | None = None
     api_key_env: str | None = None
+    api_key_file: str | None = None
+    api_key_json_path: str = "api_key"
     generation_endpoint: str = "/images/generations"
     edit_endpoint: str = "/images/edits"
     api_key_header: str = "Authorization"
@@ -112,6 +114,28 @@ def _resolve_api_key(raw: dict[str, Any], env_name: str | None) -> str | None:
     env_value = os.environ.get(ENV_API_KEY)
     if env_value:
         return env_value
+    api_key_file = raw.get("api_key_file")
+    if api_key_file:
+        path = Path(str(api_key_file)).expanduser().resolve()
+        if not path.is_file():
+            raise ConfigError(f"api_key_file does not exist: {path}")
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise ConfigError(f"api_key_file is not valid JSON: {path}") from exc
+        current: Any = payload
+        json_path = str(raw.get("api_key_json_path") or "api_key")
+        for part in json_path.split("."):
+            if isinstance(current, list):
+                current = current[int(part)]
+            elif isinstance(current, dict) and part in current:
+                current = current[part]
+            else:
+                raise ConfigError(
+                    f"api_key_json_path {json_path!r} was not found in {path}"
+                )
+        if current:
+            return str(current)
     value = raw.get("api_key")
     return str(value) if value else None
 
@@ -134,6 +158,8 @@ def _build_profile(name: str, raw: dict[str, Any]) -> ProviderProfile:
         model=model,
         api_key=_resolve_api_key(raw, raw.get("api_key_env")),
         api_key_env=str(raw["api_key_env"]) if raw.get("api_key_env") else None,
+        api_key_file=str(raw["api_key_file"]) if raw.get("api_key_file") else None,
+        api_key_json_path=str(raw.get("api_key_json_path") or "api_key"),
         generation_endpoint=str(raw.get("generation_endpoint") or "/images/generations"),
         edit_endpoint=str(raw.get("edit_endpoint") or "/images/edits"),
         api_key_header=str(raw.get("api_key_header") or "Authorization"),
@@ -218,6 +244,13 @@ def sanitized_profile(profile: ProviderProfile) -> dict[str, Any]:
         "base_url": profile.base_url,
         "model": profile.model,
         "api_key_present": bool(profile.api_key),
+        "api_key_source": (
+            f"env:{profile.api_key_env}"
+            if profile.api_key_env
+            else f"file:{profile.api_key_file}"
+            if profile.api_key_file
+            else "literal" if profile.api_key else None
+        ),
         "capabilities": profile.capabilities,
         "fallback_profiles": profile.fallback_profiles,
     }
