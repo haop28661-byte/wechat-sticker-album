@@ -1,0 +1,18 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+Thumbs.db
+
+# User credentials and generated project data
+.wechat-sticker-album/
+outputs/
+*.env
+.env
+
+# Local development state
+*.log
+.idea/
+.vscode/

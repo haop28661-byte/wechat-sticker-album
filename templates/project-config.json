@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "default_profile": "fast",
+  "profiles": {
+    "fast": {
+      "provider": "openai-compatible",
+      "base_url": "https://your-api.example/v1",
+      "model": "your-image-model",
+      "api_key_env": "WECHAT_STICKER_IMAGE_API_KEY",
+      "generation_endpoint": "/images/generations",
+      "edit_endpoint": "/images/edits",
+      "capabilities": {
+        "supports_reference_images": true,
+        "supports_transparent_background": false
+      },
+      "fallback_profiles": []
+    }
+  }
+}
