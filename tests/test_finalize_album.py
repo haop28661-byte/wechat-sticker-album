@@ -91,7 +91,9 @@ def test_finalizer_builds_folder_and_optional_zip(tmp_path):
         "--metadata-json",
         str(metadata),
     ]
-    completed = subprocess.run(command, text=True, capture_output=True, check=False)
+    completed = subprocess.run(
+        command, encoding="utf-8", capture_output=True, check=False
+    )
     assert completed.returncode == 0, completed.stderr
     assert len(list((output / "stickers").glob("*.png"))) == 6
     assert not (output / "wechat-sticker-album.zip").exists()
@@ -115,7 +117,9 @@ def test_finalizer_builds_folder_and_optional_zip(tmp_path):
     zipped = tmp_path / "output-zip"
     command[command.index(str(output))] = str(zipped)
     command.append("--zip")
-    completed = subprocess.run(command, text=True, capture_output=True, check=False)
+    completed = subprocess.run(
+        command, encoding="utf-8", capture_output=True, check=False
+    )
     assert completed.returncode == 0, completed.stderr
     assert (zipped / "wechat-sticker-album.zip").is_file()
 

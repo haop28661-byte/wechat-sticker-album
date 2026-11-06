@@ -16,6 +16,13 @@ from album_spec import STYLE_OPTIONS, THEME_OPTIONS
 CAPTION_RE = re.compile(r"^[\u3400-\u9fff]{2,4}$")
 
 
+def _configure_stdio() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure:
+            reconfigure(encoding="utf-8")
+
+
 class PlanError(RuntimeError):
     pass
 
@@ -156,6 +163,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    _configure_stdio()
     args = parse_args()
     print(
         json.dumps(

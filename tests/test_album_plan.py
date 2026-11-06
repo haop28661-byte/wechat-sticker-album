@@ -24,7 +24,12 @@ def run_validate(path: Path, require_approved: bool = False) -> subprocess.Compl
     command = [sys.executable, str(CLI), "validate-plan", "--plan-file", str(path)]
     if require_approved:
         command.append("--require-approved")
-    return subprocess.run(command, text=True, capture_output=True, check=False)
+    return subprocess.run(
+        command,
+        encoding="utf-8",
+        capture_output=True,
+        check=False,
+    )
 
 
 def test_template_plan_validates_before_approval(tmp_path):

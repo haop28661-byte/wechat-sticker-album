@@ -54,6 +54,13 @@ class AlbumError(RuntimeError):
     """A user-correctable finalization error."""
 
 
+def configure_stdio() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure:
+            reconfigure(encoding="utf-8")
+
+
 def require_file(path_value: str | Path, label: str) -> Path:
     path = Path(path_value).expanduser().resolve()
     if not path.is_file():
@@ -564,6 +571,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    configure_stdio()
     args = parse_args()
     if not args.sheet and not args.single:
         raise AlbumError("At least one --sheet or --single input is required")

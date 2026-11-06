@@ -12,7 +12,7 @@ INSTALLER = ROOT / "scripts" / "install_skill.py"
 def run_install(*args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, str(INSTALLER), *args],
-        text=True,
+        encoding="utf-8",
         capture_output=True,
         env=env,
         check=False,

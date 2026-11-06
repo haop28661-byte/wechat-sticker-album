@@ -6,6 +6,7 @@
 - Added a validated `plan.json` with backend, captions, actions, theme coverage, assets, and approval status.
 - Added `validate-plan` and `--require-approved`.
 - Separated hidden working sources from the clean project-local final folder.
+- Added UTF-8 console output and CI configuration for Windows compatibility.
 
 ## 2.1.0 - 2026-11-06
 

@@ -92,7 +92,7 @@ def test_openai_compatible_generate_and_edit(tmp_path):
             ],
             cwd=tmp_path,
             env=env,
-            text=True,
+            encoding="utf-8",
             capture_output=True,
             check=False,
         )
@@ -119,7 +119,7 @@ def test_openai_compatible_generate_and_edit(tmp_path):
             ],
             cwd=tmp_path,
             env=env,
-            text=True,
+            encoding="utf-8",
             capture_output=True,
             check=False,
         )

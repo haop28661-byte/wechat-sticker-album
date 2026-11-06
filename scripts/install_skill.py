@@ -32,6 +32,13 @@ class InstallError(RuntimeError):
     pass
 
 
+def configure_stdio() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure:
+            reconfigure(encoding="utf-8")
+
+
 def global_skills_root() -> Path:
     codex_home = os.environ.get("CODEX_HOME")
     return (Path(codex_home).expanduser() if codex_home else Path.home() / ".codex") / "skills"
@@ -102,6 +109,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    configure_stdio()
     args = parse_args()
     validate_source()
     project_root = Path(args.project_root).expanduser().resolve()

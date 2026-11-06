@@ -31,6 +31,13 @@ from validate_album_plan import PlanError, load_and_validate
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _configure_stdio() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure:
+            reconfigure(encoding="utf-8")
+
+
 def _provider_for(profile):
     if profile.provider in {"openai-compatible", "openai", "openai-images"}:
         return OpenAICompatibleProvider(profile)
@@ -293,6 +300,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    _configure_stdio()
     parser = build_parser()
     args = parser.parse_args()
     try:
