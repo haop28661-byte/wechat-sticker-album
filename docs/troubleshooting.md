@@ -2,6 +2,8 @@
 
 ## No configuration found
 
+If the current Codex session exposes a native image tool, no API configuration is required. Continue with native generation.
+
 Run:
 
 ```powershell

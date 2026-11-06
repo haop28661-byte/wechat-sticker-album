@@ -47,44 +47,7 @@ try:
 except ImportError as exc:
     raise SystemExit(f"Could not import MemeSticker helpers: {exc}") from exc
 
-
-STYLE_OPTIONS = {
-    "日常",
-    "软萌可爱",
-    "二次元",
-    "长辈风",
-    "搞笑",
-    "丧/佛系",
-    "魔性鬼畜",
-    "恶搞",
-    "简笔画",
-    "赛博朋克",
-    "蒸汽波",
-    "像素",
-    "暗黑",
-    "复古",
-}
-
-THEME_OPTIONS = {
-    "万能通用",
-    "网络热点",
-    "节日",
-    "考试/学习",
-    "工作/职场",
-    "情侣",
-    "毕业",
-    "刷屏",
-    "红包相关",
-    "游戏",
-    "运动/健身",
-    "怼人/斗图",
-    "群聊必备",
-    "节气",
-    "邀约/约起来",
-    "励志鼓舞",
-}
-
-CJK_RE = re.compile(r"^[\u3400-\u9fff]+$")
+from album_spec import CJK_RE, STYLE_OPTIONS, THEME_OPTIONS
 
 
 class AlbumError(RuntimeError):

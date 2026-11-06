@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.2.0 - 2026-11-06
+
+- Added a plan-first approval gate before any image generation.
+- Added a validated `plan.json` with backend, captions, actions, theme coverage, assets, and approval status.
+- Added `validate-plan` and `--require-approved`.
+- Separated hidden working sources from the clean project-local final folder.
+
+## 2.1.0 - 2026-11-06
+
+- Added a native Codex/ChatGPT image-generation backend that requires no separate image API key.
+- Native generation is preferred unless the user or project policy chooses an HTTP provider.
+- Added backend selection guidance and documented the no-API subscription workflow.
+
 ## 2.0.1 - 2026-11-06
 
 - Added `api_key_file` and `api_key_json_path` so a profile can reuse a local JSON credential file without copying the secret.

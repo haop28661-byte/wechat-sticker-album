@@ -1,6 +1,6 @@
 interface:
   display_name: "微信表情专辑制作"
   short_description: "从角色参考图制作微信表情专辑及赞赏引导与致谢素材"
-  default_prompt: "Use $wechat-sticker-album and my configured image API to turn this character reference into a complete WeChat sticker album."
+  default_prompt: "Use $wechat-sticker-album to plan this WeChat sticker album first with native Codex image generation when available or my configured API otherwise, then wait for my approval before generating."
 policy:
   allow_implicit_invocation: true

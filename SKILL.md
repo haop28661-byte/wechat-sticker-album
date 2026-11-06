@@ -1,11 +1,11 @@
 ---
 name: wechat-sticker-album
-description: Produce a complete WeChat sticker album from a character reference image using a user-configured image API, including a variable-count sticker set, artist cover, chat-list icon, opaque banner, appreciation guide, thank-you reward image, metadata suggestions, preview, QA, transparent-PNG processing, and project-local folder output. Use when a user wants to plan or generate a multi-asset WeChat sticker album; use a general image workflow instead for a single unrelated image.
+description: Produce a complete WeChat sticker album from a character reference image using either native Codex/ChatGPT image generation or a user-configured image API, including a variable-count sticker set, artist cover, chat-list icon, opaque banner, appreciation guide, thank-you reward image, metadata suggestions, preview, QA, transparent-PNG processing, and project-local folder output. Use when a user wants to plan or generate a multi-asset WeChat sticker album; use a general image workflow instead for a single unrelated image.
 ---
 
 # WeChat Sticker Album
 
-Turn one character reference image into a coherent WeChat sticker album and its supporting assets using the provider configured by the current user.
+Turn one character reference image into a coherent WeChat sticker album and its supporting assets using native image generation or the provider configured by the current user.
 
 ## Deliverables
 
@@ -26,6 +26,10 @@ Read [references/prompt-recipes.md](references/prompt-recipes.md) before writing
 
 Read [references/provider-config.md](references/provider-config.md) before configuring or diagnosing an image API.
 
+Read [references/backend-selection.md](references/backend-selection.md) before choosing between native image generation and an HTTP image provider.
+
+Read [references/plan-first.md](references/plan-first.md) before the first image-generation call.
+
 ## Runtime dependencies
 
 - Use Python 3.10 or newer.
@@ -38,11 +42,18 @@ Never print, store in generated metadata, or commit an API key.
 
 ## Workflow
 
-### 1. Confirm provider readiness
+### 1. Select the generation backend
 
-Use the existing project configuration, user configuration, or environment-only configuration described in [references/provider-config.md](references/provider-config.md).
+Apply this order:
 
-Run:
+1. Follow an explicit user choice or project instruction.
+2. Use native Codex/ChatGPT image generation when the current session exposes it and no project policy requires an HTTP provider.
+3. Otherwise use the configured OpenAI-compatible or custom HTTP provider.
+4. Ask about API configuration only when native generation is unavailable and no valid API provider exists.
+
+With native generation, do not run `doctor`, request an API key, or show API setup instructions. Generate directly with the host image tool and save the resulting source images into the album's project-local `source` folder.
+
+With an HTTP provider, run:
 
 ```powershell
 python "<skill-root>\scripts\cli.py" doctor
@@ -50,7 +61,7 @@ python "<skill-root>\scripts\cli.py" doctor
 
 Use `--probe` only when the configured provider exposes a compatible `GET /models` endpoint.
 
-Completion: the selected profile has a provider type, base URL, model, credential source, and explicit capability settings.
+Completion: one provisional backend is selected for presentation in the album plan. Native mode requires no API configuration; HTTP mode requires a valid profile and credential source.
 
 ### 2. Establish the album contract
 
@@ -69,11 +80,39 @@ Completion: every required asset, count, theme, style, and character anchor is e
 
 ### 3. Plan before generation
 
-Create a numbered plan with distinct captions, actions, expressions, and prop or outfit changes. Ensure at least half of the meanings support the selected theme.
+Create `plan.json` from `templates/album-plan.json` under:
 
-When the user has not explicitly authorized generation, stop after presenting the plan and prompt draft.
+```text
+<project>/.wechat-sticker-album/work/<run>/plan.json
+```
 
-Completion: the user accepted the plan or explicitly asked to start generation.
+Include:
+
+- backend and profile/model, or native generation
+- exact sticker count
+- theme and 1 or 2 styles
+- every caption and action
+- theme-related status for each sticker
+- supporting assets
+
+Run the non-approved validation:
+
+```powershell
+python "<skill-root>\scripts\cli.py" validate-plan `
+  --plan-file "<plan.json>"
+```
+
+Present the complete plan in the conversation and stop. A request to create a sticker album is not approval to start paid generation.
+
+Only after an explicit phrase such as “确认开始”, “按这个生成”, or “直接生成，不用确认”:
+
+1. Set `"approved": true`.
+2. Record the user's exact intent in `approval_note`.
+3. Re-run validation with `--require-approved`.
+
+If the user changes the backend, count, theme, styles, captions, or supporting assets, present the revised plan and request approval again.
+
+Completion: the approved plan passes `validate-plan --require-approved`; no image has been generated before this point.
 
 ### 4. Generate sticker batches
 
@@ -82,7 +121,7 @@ For `N` stickers:
 - generate `floor(N / 6)` sheets, each exactly 3 columns by 2 rows
 - generate the remaining `N % 6` stickers singly
 
-Use the configured profile and preferred model:
+Use the configured profile and preferred model for the HTTP backend:
 
 ```powershell
 python "<skill-root>\scripts\cli.py" generate `
@@ -94,6 +133,12 @@ python "<skill-root>\scripts\cli.py" generate `
 ```
 
 If the profile supports reference-image editing, use it. If it is text-only, use `--text-only` only after warning that identity consistency will be weaker.
+
+When native generation is selected, use the current Codex/ChatGPT image tool directly with the same prompt contracts. Do not invoke the HTTP generation CLI. Save each generated source under:
+
+```text
+<project>/.wechat-sticker-album/work/<run>/source/
+```
 
 When a profile has `fallback_profiles`, the CLI retries those profiles in order after provider failure. Inspect each sheet before generating the next.
 
@@ -120,6 +165,8 @@ Write output below the current project:
 ```text
 <project>/outputs/wechat-sticker-album/<timestamp>-sticker-album/
 ```
+
+Keep plans and source images in the hidden working directory; the visible output folder remains clean.
 
 Run the finalizer:
 

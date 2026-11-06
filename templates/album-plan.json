@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "album_name": "示例新年表情包",
+  "theme": "节日",
+  "styles": ["日常", "软萌可爱"],
+  "sticker_count": 6,
+  "captions_enabled": true,
+  "backend": {
+    "mode": "native",
+    "profile": null,
+    "reason": "Native Codex image generation is available"
+  },
+  "sticker_items": [
+    {"index": 1, "caption": "新年快乐", "action": "双手作揖拜年", "theme_related": true},
+    {"index": 2, "caption": "恭喜发财", "action": "抱住大金元宝", "theme_related": true},
+    {"index": 3, "caption": "吃饺子", "action": "捧着饺子开心大笑", "theme_related": true},
+    {"index": 4, "caption": "看舞狮", "action": "兴奋鼓掌看舞狮", "theme_related": true},
+    {"index": 5, "caption": "比个心", "action": "双手比心撒娇", "theme_related": false},
+    {"index": 6, "caption": "晚安啦", "action": "抱着枕头打哈欠", "theme_related": false}
+  ],
+  "supporting_assets": {
+    "artist_cover": true,
+    "chat_icon": true,
+    "banner": true,
+    "appreciation_guide": true,
+    "thank_you_image": true
+  },
+  "approved": false,
+  "approval_note": ""
+}

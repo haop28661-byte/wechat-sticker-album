@@ -1,6 +1,13 @@
 # Image Providers
 
-The skill calls the user's configured provider. It does not contain a default vendor, base URL, API key, or model name.
+The skill supports two backends:
+
+1. Native Codex/ChatGPT image generation, which requires no separate image API key.
+2. A user-configured HTTP provider, which does not contain a default vendor, base URL, API key, or model name.
+
+Prefer native generation when the current session exposes it, unless the user or project policy explicitly selects an API.
+
+The decision rules are documented in [references/backend-selection.md](../references/backend-selection.md).
 
 ## OpenAI-compatible API
 

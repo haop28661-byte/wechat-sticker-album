@@ -1,6 +1,8 @@
 # Provider Configuration
 
-The skill is independent of any specific image provider. Configure an OpenAI-compatible image API by default, or describe a custom JSON HTTP API.
+This reference applies only to the HTTP backend. Native Codex/ChatGPT image generation requires no provider configuration. See [backend-selection.md](backend-selection.md) before configuring an API.
+
+The HTTP backend is independent of any specific image provider. Configure an OpenAI-compatible image API, or describe a custom JSON HTTP API.
 
 ## Discovery order
 

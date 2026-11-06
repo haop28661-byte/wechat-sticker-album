@@ -211,8 +211,10 @@ def load_settings(
         settings = _settings_from_env()
         if settings is None:
             raise ConfigError(
-                "No image API configuration found. Run `python scripts/cli.py init --project-root <project>`, "
-                "or set WECHAT_STICKER_IMAGE_BASE_URL and WECHAT_STICKER_IMAGE_MODEL."
+                "The HTTP image backend is not configured. If this Codex session has native image "
+                "generation, no API setup is required. Otherwise run "
+                "`python scripts/cli.py init --project-root <project>`, or set "
+                "WECHAT_STICKER_IMAGE_BASE_URL and WECHAT_STICKER_IMAGE_MODEL."
             )
     else:
         try:

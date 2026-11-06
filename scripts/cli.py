@@ -25,6 +25,7 @@ from config import (
 )
 from providers import CustomHttpProvider, OpenAICompatibleProvider
 from providers.openai_compatible import ProviderRequestError
+from validate_album_plan import PlanError, load_and_validate
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -99,6 +100,15 @@ def command_init(args: argparse.Namespace) -> int:
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(template, destination)
     print(json.dumps({"ok": True, "config": str(destination)}, ensure_ascii=False))
+    return 0
+
+
+def command_validate_plan(args: argparse.Namespace) -> int:
+    result = load_and_validate(
+        args.plan_file,
+        require_approved=args.require_approved,
+    )
+    print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -243,6 +253,14 @@ def build_parser() -> argparse.ArgumentParser:
     init.add_argument("--force", action="store_true")
     init.set_defaults(func=command_init)
 
+    validate_plan = sub.add_parser(
+        "validate-plan",
+        help="Validate the album plan before any image generation.",
+    )
+    validate_plan.add_argument("--plan-file", required=True)
+    validate_plan.add_argument("--require-approved", action="store_true")
+    validate_plan.set_defaults(func=command_validate_plan)
+
     generate = sub.add_parser("generate", help="Generate one image using a configured provider profile.")
     generate.add_argument("--config")
     generate.add_argument("--profile")
@@ -285,6 +303,9 @@ def main() -> int:
     except ProviderRequestError as exc:
         print(f"Provider error: {exc}", file=sys.stderr)
         return 1
+    except PlanError as exc:
+        print(f"Plan validation failed: {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

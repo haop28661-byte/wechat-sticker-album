@@ -1,13 +1,14 @@
 # WeChat Sticker Album
 
-A model-agnostic Codex skill for turning one character reference image into a complete, upload-ready WeChat sticker album.
+A backend-flexible Codex skill for turning one character reference image into a complete, upload-ready WeChat sticker album.
 
-The skill owns the planning, prompt contracts, asset validation, transparency processing, metadata checks, and packaging. Image generation is delegated to the API profile configured by the current user.
+The skill owns the planning, prompt contracts, asset validation, transparency processing, metadata checks, and packaging. Image generation can use native Codex/ChatGPT image generation or a provider configured by the current user.
 
 ## Features
 
 - Variable sticker count: full 3 x 2 sheets for groups of six, single generation for the remainder
 - Artist cover, chat-list icon, banner, appreciation guide, and thank-you reward image
+- Native Codex/ChatGPT image generation with no separate API configuration
 - OpenAI-compatible `images/generations` and `images/edits` support
 - Configurable custom JSON HTTP provider
 - Configurable model profiles and fallback profiles
@@ -22,7 +23,7 @@ The skill owns the planning, prompt contracts, asset validation, transparency pr
 
 - Python 3.10+
 - Codex skill support
-- An image API exposing OpenAI-compatible generation and editing endpoints, or a mapped custom JSON API
+- Either native image generation in the current Codex session, or an image API exposing OpenAI-compatible generation/editing
 
 ```powershell
 python -m pip install -r requirements.txt
@@ -65,9 +66,40 @@ macOS/Linux:
 
 Both modes copy the complete runtime directory. They do not copy only `SKILL.md`.
 
-## Configure an image API
+## Generation backends
 
-Create a project config:
+The skill chooses the backend in this order:
+
+1. explicit user or project instruction
+2. native Codex/ChatGPT image generation when available
+3. configured HTTP image provider
+4. ask the user only when no backend is available
+
+If the user has a subscription-backed native image tool, no API setup is needed.
+
+This project follows any explicit `AGENTS.md` provider policy first. A project that requires a specific provider will continue using that provider.
+
+See [references/backend-selection.md](references/backend-selection.md).
+
+## Plan-first workflow
+
+A request to create a sticker album starts planning, not paid generation.
+
+The skill creates `plan.json`, presents every caption and action, and waits for explicit approval. It starts generating only after:
+
+```powershell
+python scripts/cli.py validate-plan `
+  --plan-file "<plan.json>" `
+  --require-approved
+```
+
+passes. Approved plans make retries and single-asset fixes easier without repeatedly asking the same album-level questions.
+
+See [references/plan-first.md](references/plan-first.md).
+
+## Configure an optional image API
+
+The following setup is only needed when using the HTTP backend. Create a project config:
 
 ```powershell
 python scripts/cli.py init --scope project --project-root .
@@ -105,25 +137,29 @@ See [docs/providers.md](docs/providers.md) and [references/provider-config.md](r
 
 ## Usage
 
-Generate one source image:
+Ask Codex to create the sticker album. It responds with an album plan and waits for approval.
+
+With native generation, no API key is requested.
+
+With the HTTP backend, generate one source image:
 
 ```powershell
 python scripts/cli.py generate `
   --reference character.png `
   --prompt-file prompts/sheet-01.txt `
   --size 1536x1024 `
-  --output outputs/wechat-sticker-album/run/source/sheet-01.png
+  --output .wechat-sticker-album/work/run/source/sheet-01.png
 ```
 
 Finalize the album:
 
 ```powershell
 python scripts/finalize_album.py `
-  --sheet outputs/wechat-sticker-album/run/source/sheet-01.png `
-  --sheet outputs/wechat-sticker-album/run/source/sheet-02.png `
-  --cover-source outputs/wechat-sticker-album/run/source/cover.png `
-  --chat-icon-source outputs/wechat-sticker-album/run/source/icon.png `
-  --banner-source outputs/wechat-sticker-album/run/source/banner.png `
+  --sheet .wechat-sticker-album/work/run/source/sheet-01.png `
+  --sheet .wechat-sticker-album/work/run/source/sheet-02.png `
+  --cover-source .wechat-sticker-album/work/run/source/cover.png `
+  --chat-icon-source .wechat-sticker-album/work/run/source/icon.png `
+  --banner-source .wechat-sticker-album/work/run/source/banner.png `
   --output-dir outputs/wechat-sticker-album/run `
   --expected-count 12
 ```
